@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login — ZK PM</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/style.css" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      /* Full Page Center */
+      .full-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #ffffff, #f0f0f0);
+        font-family: "Inter", sans-serif;
+      }
+
+      /* Login Card */
+      .card {
+        max-width: 400px;
+        width: 100%;
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(142, 45, 226, 0.2);
+        animation: fadeIn 0.8s ease-in-out;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(142, 45, 226, 0.4);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20%,
+        60% {
+          transform: translateX(-8px);
+        }
+        40%,
+        80% {
+          transform: translateX(8px);
+        }
+      }
+
+      .center-text {
+        text-align: center;
+      }
+
+      .btn.primary {
+        background: linear-gradient(90deg, #8e2de2, #ff4b2b);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 6px rgba(142, 45, 226, 0.3);
+      }
+      .btn.primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 18px rgba(142, 45, 226, 0.5);
+      }
+
+      .btn.ghost {
+        background: transparent;
+        border: 1px solid #ccc;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+      }
+      .btn.ghost:hover {
+        background: #f9f9f9;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+      input:focus {
+        outline: none;
+        border-color: #8e2de2;
+        box-shadow: 0 0 6px rgba(142, 45, 226, 0.5);
+        transform: scale(1.02);
+      }
+
+      .password-wrapper {
+        position: relative;
+      }
+      .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #888;
+        transition: color 0.2s ease;
+      }
+      .toggle-password:hover {
+        color: #8e2de2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="full-center">
+      <div class="card" id="loginCard">
+        <h2 class="center-text">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
+        </h2>
+        <form id="loginForm" autocomplete="off" class="center-text">
+          <!-- Email -->
+          <label for="loginEmail"
+            ><i class="fa-solid fa-envelope"></i> Email</label
+          >
+          <input
+            id="loginEmail"
+            type="email"
+            placeholder="Enter your email"
+            required
+          />
+
+          <!-- Password -->
+          <label for="loginPassword"
+            ><i class="fa-solid fa-lock"></i> Password</label
+          >
+          <div class="password-wrapper">
+            <input
+              id="loginPassword"
+              type="password"
+              placeholder="Enter your password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-row center-text" style="margin-top: 15px">
+            <button class="btn primary" type="submit">
+              <i class="fa-solid fa-arrow-right-to-bracket"></i> Submit
+            </button>
+            <a href="register.html" class="btn ghost"
+              ><i class="fa-solid fa-user-plus"></i> Go to Register</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Password toggle
+      const togglePassword = document.getElementById("togglePassword");
+      const passwordInput = document.getElementById("loginPassword");
+      togglePassword.addEventListener("click", () => {
+        const isHidden = passwordInput.type === "password";
+        passwordInput.type = isHidden ? "text" : "password";
+        togglePassword.classList.toggle("fa-eye-slash", !isHidden);
+        togglePassword.classList.toggle("fa-eye", isHidden);
+      });
+
+      // Form submit
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault(); // ✅ prevent page reload
+
+          const card = document.getElementById("loginCard");
+          card.style.animation = "shake 0.4s";
+          setTimeout(() => {
+            card.style.animation = "";
+          }, 400);
+
+          const email = document.getElementById("loginEmail").value.trim();
+          const password = document
+            .getElementById("loginPassword")
+            .value.trim();
+
+          if (!email || !password) {
+            alert("Please enter both email and password");
+            return;
+          }
+
+          try {
+            const res = await fetch("http://127.0.0.1:5000/api/auth/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+              alert(data.error || "Login failed ❌");
+              return;
+            }
+
+            localStorage.setItem("token", data.access_token);
+            alert("Login successful ✅");
+            window.location.href = "vault.html"; // redirect
+          } catch (err) {
+            console.error("Login error:", err);
+            alert("Network error. Try again later.");
+          }
+        });
+    </script>
+  </body>
+</html>

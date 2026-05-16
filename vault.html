@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>🔑 My Vault</title>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #ffffff;
+        color: #333;
+      }
+
+      h1 {
+        color: #6a11cb;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .vault-container {
+        max-width: 750px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+
+      .entry,
+      .add-form,
+      .empty {
+        background: #fff;
+        color: #333;
+        padding: 15px;
+        border-radius: 12px;
+        margin: 12px 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .entry strong {
+        display: block;
+        margin-bottom: 6px;
+        color: #6a11cb;
+      }
+
+      button {
+        margin: 5px 5px 5px 0;
+        padding: 10px 16px;
+        cursor: pointer;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: background 0.3s;
+        font-size: 14px;
+      }
+
+      .btn-primary {
+        background: #6a11cb;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #4e0d99;
+      }
+
+      .btn-danger {
+        background: #e63946;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #b0212f;
+      }
+
+      .btn-secondary {
+        background: #7b2cbf;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #5a189a;
+      }
+
+      #toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #6a11cb;
+        color: #fff;
+        padding: 12px 18px;
+        border-radius: 6px;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+
+      #toast.show {
+        opacity: 1;
+      }
+
+      /* Standardized input fields */
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 12px 14px;
+        margin: 6px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+
+      /* Input group for password with eye icon */
+      .input-group {
+        position: relative;
+        width: 100%;
+      }
+
+      .toggle-eye {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 18px;
+        color: #6a11cb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="vault-container">
+      <h1>🏦 My Secure Vault</h1>
+      <p style="text-align: center; color: #666">
+        All your credentials are safely stored here.
+      </p>
+
+      <!-- Master password -->
+      <div class="add-form">
+        <label><b>Enter Master Password:</b></label
+        ><br />
+        <div class="input-group">
+          <input
+            type="password"
+            id="masterPassword"
+            placeholder="Master password"
+          />
+          <span
+            class="toggle-eye"
+            onclick="toggleVisibility('masterPassword', this)"
+            >👁️</span
+          >
+        </div>
+        <button class="btn-primary" onclick="loadVault()">Unlock Vault</button>
+      </div>
+
+      <!-- Add new credential -->
+      <div class="add-form">
+        <h3>Add New Credential</h3>
+        <input type="text" id="site" placeholder="Site (e.g. Gmail)" />
+        <input type="text" id="username" placeholder="Username / Email" />
+        <div class="input-group">
+          <input type="password" id="password" placeholder="Password" />
+          <span class="toggle-eye" onclick="toggleVisibility('password', this)"
+            >👁️</span
+          >
+        </div>
+        <button class="btn-primary" onclick="addEntry()">Add</button>
+      </div>
+
+      <!-- Vault entries -->
+      <h3 id="entryCount"></h3>
+      <div id="vaultEntries"></div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script>
+      const email = localStorage.getItem("userEmail") || "test@example.com";
+      const apiBase = "http://localhost:5000/api/vault";
+      let masterPassword = "";
+
+      async function loadVault() {
+        masterPassword = document.getElementById("masterPassword").value;
+        if (!masterPassword) {
+          showToast("Enter master password!");
+          return;
+        }
+
+        const res = await fetch(`${apiBase}/${email}`);
+        const data = await res.json();
+        displayEntries(data.entries || []);
+      }
+
+      function encrypt(text) {
+        return CryptoJS.AES.encrypt(text, masterPassword).toString();
+      }
+
+      function decrypt(cipher) {
+        try {
+          const bytes = CryptoJS.AES.decrypt(cipher, masterPassword);
+          return bytes.toString(CryptoJS.enc.Utf8);
+        } catch (e) {
+          return "Invalid master password!";
+        }
+      }
+
+      function displayEntries(entries) {
+        const container = document.getElementById("vaultEntries");
+        const count = document.getElementById("entryCount");
+        container.innerHTML = "";
+
+        if (entries.length === 0) {
+          count.textContent = "No entries saved.";
+          container.innerHTML = `<div class="empty">🔒 Your vault is empty.</div>`;
+          return;
+        }
+
+        count.textContent = `Saved Entries: ${entries.length}`;
+        entries.forEach((entry, i) => {
+          const div = document.createElement("div");
+          div.className = "entry";
+
+          const decryptedUser = decrypt(entry.user);
+          const decryptedPass = decrypt(entry.password);
+
+          div.innerHTML = `
+          <strong>🔹 ${entry.site}</strong>
+          Username: <span id="user-${i}">${decryptedUser}</span>
+          <button class="btn-secondary" onclick="copyToClipboard('${decryptedUser}')">Copy Username</button><br>
+          Password: <span id="pass-${i}">••••••</span><br>
+          <button class="btn-secondary" onclick="togglePassword(${i}, '${decryptedPass}')">Show/Hide</button>
+          <button class="btn-secondary" onclick="copyToClipboard('${decryptedPass}')">Copy Password</button>
+          <button class="btn-danger" onclick="deleteEntryConfirm('${entry.site}')">Delete</button>
+        `;
+          container.appendChild(div);
+        });
+      }
+
+      async function addEntry() {
+        const site = document.getElementById("site").value;
+        const user = document.getElementById("username").value;
+        const pass = document.getElementById("password").value;
+
+        if (!site || !user || !pass || !masterPassword) {
+          showToast("Fill all fields + master password!");
+          return;
+        }
+
+        const newEntry = {
+          site,
+          user: encrypt(user),
+          password: encrypt(pass),
+          email,
+        };
+
+        await fetch(`${apiBase}/${email}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newEntry),
+        });
+
+        document.getElementById("site").value = "";
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+
+        showToast("Entry added ✅");
+        loadVault();
+      }
+
+      function togglePassword(i, pass) {
+        const span = document.getElementById(`pass-${i}`);
+        span.textContent = span.textContent === "••••••" ? pass : "••••••";
+      }
+
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        showToast("Copied to clipboard 📋");
+      }
+
+      async function deleteEntryConfirm(site) {
+        if (!confirm(`Delete entry for ${site}?`)) return;
+        await fetch(`${apiBase}/${email}/${site}`, { method: "DELETE" });
+        showToast("Entry deleted ❌");
+        loadVault();
+      }
+
+      function showToast(msg) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.className = "show";
+        setTimeout(
+          () => (toast.className = toast.className.replace("show", "")),
+          2000
+        );
+      }
+
+      // Toggle eye icon
+      function toggleVisibility(id, el) {
+        const input = document.getElementById(id);
+        if (input.type === "password") {
+          input.type = "text";
+          el.textContent = "🚫";
+        } else {
+          input.type = "password";
+          el.textContent = "👁️";
+        }
+      }
+    </script>
+  </body>
+</html>

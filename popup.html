@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ZK Autofill</title>
+    <link rel="stylesheet" href="../frontend/css/style.css" />
+    <script defer src="./popup.js"></script>
+    <style>
+      body {
+        width: 320px;
+        padding: 12px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+      }
+      input,
+      button {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body class="popup">
+    <h3>Quick Autofill</h3>
+    <div class="row">
+      <input id="username" placeholder="username/email" />
+    </div>
+    <div class="row" style="margin-top: 6px">
+      <input id="password" type="password" placeholder="password" />
+    </div>
+    <div class="row" style="margin-top: 10px">
+      <button id="fill" class="btn">Fill</button>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Register — ZK PM</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: #f8f9fa;
+      }
+
+      .full-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        animation: fadeIn 1s ease-out;
+      }
+
+      .card {
+        max-width: 400px;
+        width: 100%;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(128, 0, 128, 0.2);
+        animation: slideUp 0.8s ease-out;
+      }
+
+      .center-text {
+        text-align: center;
+      }
+
+      .btn.primary {
+        background: linear-gradient(135deg, #8e44ad, #ff6f00);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(142, 68, 173, 0.4);
+      }
+      .btn.primary:hover {
+        background: linear-gradient(135deg, #732d91, #e65100);
+        transform: scale(1.05);
+        box-shadow: 0 6px 18px rgba(142, 68, 173, 0.6);
+      }
+
+      .btn.ghost {
+        background: transparent;
+        border: 1px solid #ccc;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+      .btn.ghost:hover {
+        background: #f1f1f1;
+        transform: scale(1.05);
+      }
+
+      .input-wrapper {
+        position: relative;
+        width: 100%;
+      }
+
+      .input-wrapper input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .input-wrapper input:focus {
+        outline: none;
+        border-color: #8e44ad;
+        box-shadow: 0 0 6px rgba(142, 68, 173, 0.6);
+        transform: scale(1.02);
+      }
+
+      .input-wrapper i.toggle-eye {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #888;
+      }
+
+      small {
+        display: block;
+        text-align: left;
+        color: red;
+        font-size: 12px;
+        margin-top: -6px;
+        margin-bottom: 8px;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="full-center">
+      <div class="card">
+        <h2 class="center-text">
+          <i class="fa-solid fa-user-plus"></i> Register
+        </h2>
+        <form
+          id="registerForm"
+          autocomplete="off"
+          class="center-text"
+          novalidate
+        >
+          <!-- Email -->
+          <label for="regEmail"
+            ><i class="fa-solid fa-envelope"></i> Email</label
+          >
+          <div class="input-wrapper">
+            <input
+              id="regEmail"
+              type="email"
+              placeholder="Enter your email"
+              required
+              pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+            />
+          </div>
+          <small id="emailError"></small>
+
+          <!-- Password -->
+          <label for="regPassword"
+            ><i class="fa-solid fa-lock"></i> Password</label
+          >
+          <div class="input-wrapper">
+            <input
+              id="regPassword"
+              type="password"
+              placeholder="Create a password"
+              required
+              minlength="8"
+            />
+            <i
+              class="fa-solid fa-eye-slash toggle-eye"
+              onclick="togglePassword('regPassword', this)"
+            ></i>
+          </div>
+          <small id="passwordError"></small>
+
+          <!-- Confirm Password -->
+          <label for="regConfirmPassword"
+            ><i class="fa-solid fa-lock"></i> Confirm Password</label
+          >
+          <div class="input-wrapper">
+            <input
+              id="regConfirmPassword"
+              type="password"
+              placeholder="Re-enter your password"
+              required
+            />
+            <i
+              class="fa-solid fa-eye-slash toggle-eye"
+              onclick="togglePassword('regConfirmPassword', this)"
+            ></i>
+          </div>
+          <small id="confirmError"></small>
+
+          <!-- Actions -->
+          <div class="form-row center-text" style="margin-top: 15px">
+            <button class="btn primary" type="submit">
+              <i class="fa-solid fa-paper-plane"></i> Submit
+            </button>
+            <a href="login.html" class="btn ghost"
+              ><i class="fa-solid fa-arrow-left"></i> Back to Login</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Toggle password visibility
+      function togglePassword(id, el) {
+        const input = document.getElementById(id);
+        if (input.type === "password") {
+          input.type = "text";
+          el.classList.remove("fa-eye-slash");
+          el.classList.add("fa-eye");
+        } else {
+          input.type = "password";
+          el.classList.remove("fa-eye");
+          el.classList.add("fa-eye-slash");
+        }
+      }
+
+      const form = document.getElementById("registerForm");
+      const email = document.getElementById("regEmail");
+      const password = document.getElementById("regPassword");
+      const confirmPassword = document.getElementById("regConfirmPassword");
+
+      const emailError = document.getElementById("emailError");
+      const passwordError = document.getElementById("passwordError");
+      const confirmError = document.getElementById("confirmError");
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        let valid = true;
+        emailError.textContent = "";
+        passwordError.textContent = "";
+        confirmError.textContent = "";
+
+        // Email validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email.value.trim())) {
+          emailError.textContent = "Please enter a valid email address.";
+          valid = false;
+        }
+
+        // Password validation
+        const passPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passPattern.test(password.value)) {
+          passwordError.textContent =
+            "Password must be at least 8 characters with uppercase, lowercase, and a number.";
+          valid = false;
+        }
+
+        // Confirm password validation
+        if (password.value !== confirmPassword.value) {
+          confirmError.textContent = "Passwords do not match.";
+          valid = false;
+        }
+
+        if (!valid) return;
+
+        // Backend request
+        try {
+          const res = await fetch("http://127.0.0.1:5000/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: email.value.trim(),
+              password: password.value,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            alert(data.error || "Registration failed ❌");
+            return;
+          }
+
+          alert("Registration successful ✅ Please login!");
+          window.location.href = "login.html";
+        } catch (err) {
+          console.error("Network error:", err);
+          alert("Network error. Try again later.");
+        }
+      });
+    </script>
+  </body>
+</html>
